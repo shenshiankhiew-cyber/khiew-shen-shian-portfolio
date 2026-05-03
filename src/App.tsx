@@ -3,491 +3,546 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowRight, 
+  Download, 
+  ExternalLink, 
+  CheckCircle2, 
+  Zap, 
   Target, 
-  Repeat, 
-  Users, 
-  Database, 
-  Activity, 
   MessageSquare, 
-  MousePointer2,
-  Lock,
-  MessageCircle,
-  Plus,
-  CheckCircle2,
-  AlertCircle
+  TrendingDown, 
+  TrendingUp, 
+  Clock, 
+  Database,
+  BarChart3,
+  Globe,
+  Mail,
+  Linkedin,
+  ChevronDown
 } from 'lucide-react';
 
-// --- Building Blocks ---
-
-const Section = ({ 
-  children, 
-  className = "", 
-  id = "",
-  paddingY = "py-32" 
-}: { 
-  children: React.ReactNode; 
-  className?: string; 
-  id?: string;
-  paddingY?: string;
-}) => (
-  <section id={id} className={`${paddingY} px-6 md:px-12 lg:px-24 overflow-hidden border-b border-brand-border ${className}`}>
-    <div className="max-w-7xl mx-auto">
-      {children}
-    </div>
-  </section>
-);
-
-const Badge = ({ children }: { children: React.ReactNode }) => (
-  <span className="inline-block py-1 px-3 mb-8 text-[10px] uppercase tracking-[0.25em] font-black border border-brand-border text-brand-mute">
-    {children}
-  </span>
+const GreenText = ({ children }: { children: React.ReactNode }) => (
+  <span className="text-brand">{children}</span>
 );
 
 const SectionLabel = ({ children }: { children: React.ReactNode }) => (
-  <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-brand-mute block mb-4">
+  <motion.div 
+    initial={{ opacity: 0, x: -20 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    viewport={{ once: true }}
+    className="text-brand font-display font-bold tracking-widest text-xs uppercase mb-4"
+  >
     {children}
-  </span>
+  </motion.div>
 );
 
-const BigHeadline = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <h2 className={`text-6xl md:text-8xl font-display font-extrabold tracking-tight leading-[0.85] uppercase mb-12 ${className}`}>
-    {children}
-  </h2>
+const StatCard = ({ val, label, sub }: { val: string, label: string, sub: string }) => (
+  <motion.div 
+    whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+    className="premium-border bg-surface-lighter p-6 rounded-lg"
+  >
+    <div className="text-3xl font-display font-bold text-brand mb-1">{val}</div>
+    <div className="text-white font-medium mb-1">{label}</div>
+    <div className="text-xs text-gray-500 leading-tight">{sub}</div>
+  </motion.div>
 );
 
-const SmallHeading = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <h3 className={`text-xs uppercase font-bold tracking-[0.25em] mb-12 flex items-center gap-4 ${className}`}>
-    <span className="w-8 h-[1px] bg-brand-border"></span>
-    {children}
-  </h3>
-);
-
-// --- Diagrams ---
-
-const FunnelDiagram = ({ points }: { points: string[] }) => (
-  <div className="w-full max-w-sm mx-auto flex flex-col gap-[1px] bg-brand-border border border-brand-border">
-    {points.map((point, i) => (
-      <div 
-        key={i} 
-        className="h-24 bg-brand-bg flex items-center justify-between px-8 relative group"
-        style={{ width: `${100 - (i * 10)}%`, margin: '0 auto' }}
-      >
-        <span className="text-[10px] uppercase font-bold tracking-widest text-brand-mute">{point}</span>
-        {point.toLowerCase().includes('leak') || point.toLowerCase().includes('delay') ? (
-          <motion.div 
-            animate={{ x: [0, 5], opacity: [1, 0.5, 1] }} 
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="flex items-center gap-2 text-red-500"
-          >
-            <AlertCircle size={12} />
-            <span className="text-[8px] font-black italic">LEAK</span>
-          </motion.div>
-        ) : <CheckCircle2 size={12} className="opacity-20" />}
-      </div>
-    ))}
-  </div>
-);
-
-const FlowDiagram = ({ steps }: { steps: string[] }) => (
-  <div className="flex flex-wrap items-center justify-center gap-4 md:gap-2">
-    {steps.map((step, i) => (
-      <React.Fragment key={i}>
-        <div className="border border-brand-border px-4 py-2 bg-brand-dim text-[10px] uppercase font-bold tracking-widest whitespace-nowrap">
-          {step}
-        </div>
-        {i < steps.length - 1 && (
-          <div className="w-6 h-[1px] bg-brand-border hidden md:block"></div>
-        )}
-      </React.Fragment>
-    ))}
-  </div>
-);
-
-// --- Sections ---
-
-const Navbar = () => (
-  <nav className="fixed top-0 left-0 w-full z-50 border-b border-brand-border bg-brand-bg/90 backdrop-blur-md">
-    <div className="max-w-7xl mx-auto px-6 md:px-12 py-6 flex justify-between items-end">
-      <div className="font-display font-bold text-xs uppercase tracking-[0.3em]">KHIEW SHEN SHIAN</div>
-      <div className="hidden lg:flex gap-12 text-[10px] uppercase tracking-widest font-bold text-brand-mute">
-        <a href="#system" className="hover:text-brand-ink transition-colors">The System</a>
-        <a href="#proof" className="hover:text-brand-ink transition-colors">Proof</a>
-        <a href="#thinking" className="hover:text-brand-ink transition-colors">Philosophy</a>
-      </div>
-      <a 
-        href="#contact" 
-        className="text-[10px] uppercase tracking-widest font-bold border border-brand-ink px-6 py-2.5 hover:bg-brand-ink hover:text-brand-bg transition-all"
-      >
-        Contact
-      </a>
-    </div>
-  </nav>
-);
-
-const Hero = () => (
-  <Section className="pt-56">
-    <div className="grid lg:grid-cols-2 gap-24 items-center">
-      <div className="order-2 lg:order-1">
-        <Badge>Khiew Shen Shian — Growth Operator</Badge>
-        <h1 className="text-7xl md:text-[84px] font-display font-extrabold tracking-tight leading-[0.85] uppercase mb-12">
-          I Fix Broken <br />Conversion <br />Systems
-        </h1>
-        <p className="text-xl text-brand-mute max-w-lg mb-16 font-medium leading-relaxed">
-          Most teams optimise ads. I fix what happens after the lead — where conversion is actually won or lost.
-        </p>
-        
-        <div className="grid grid-cols-3 gap-8 py-12 border-t border-brand-border mb-4">
-          {[
-            { val: "+16.89%", lab: "Conversion" },
-            { val: "28% → 45%", lab: "Verify Rate" },
-            { val: "-70%", lab: "Response" }
-          ].map((m, i) => (
-            <div key={i} className="flex flex-col gap-1">
-              <span className="text-xl md:text-2xl font-mono font-bold text-brand-accent">{m.val}</span>
-              <span className="text-[9px] uppercase tracking-widest text-brand-mute font-bold">{m.lab}</span>
-            </div>
-          ))}
-        </div>
-        <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-brand-mute/60 mb-12">Most teams don’t measure this. I build systems that do.</p>
-
-        <a href="#proof" className="inline-block bg-brand-ink text-brand-bg px-12 py-4 font-black uppercase text-[11px] tracking-[0.2em] hover:opacity-90 transition-opacity">
-          See Case Studies
-        </a>
-      </div>
-
-      <div className="order-1 lg:order-2 flex justify-center">
-        <div className="relative w-full max-w-md aspect-[4/5] bg-brand-dim border border-brand-border overflow-hidden group">
-          <img 
-            src="/src/assets/images/shenshiankhiew.jpeg" 
-            alt="Khiew Shen Shian" 
-            className="w-full h-full object-cover grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105 group-hover:opacity-100"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-brand-bg/80 to-transparent opacity-60"></div>
-          <div className="absolute bottom-8 left-8 text-[10px] font-mono uppercase tracking-widest text-white/50 group-hover:text-white transition-colors">
-            KHIEWSHENSHIAN
-          </div>
-        </div>
-      </div>
-    </div>
-  </Section>
-);
-
-const Introduction = () => (
-  <Section className="bg-brand-dim/30">
-    <div className="grid lg:grid-cols-2 gap-24">
-      <SectionLabel>Process Override</SectionLabel>
-      <div className="space-y-12">
-        <p className="text-3xl md:text-4xl font-display font-medium tracking-tight leading-tight">
-          Most marketing teams optimise what’s visible. <br />
-          I focus on what actually drives revenue — the system after the lead.
-        </p>
-        <p className="text-lg text-brand-mute font-medium leading-relaxed max-w-xl">
-          Conversion doesn’t fail at ads. It fails in response speed, qualification, and handover.
-        </p>
-        <p className="text-lg text-brand-ink font-bold uppercase tracking-widest text-sm">
-          That’s where I work.
-        </p>
-      </div>
-    </div>
-  </Section>
-);
-
-const Problem = () => (
-  <Section id="problem">
-    <div className="grid lg:grid-cols-2 gap-24 items-center">
-      <div>
-        <SectionLabel>The Diagnostic</SectionLabel>
-        <BigHeadline>Marketing Fails <br />After the Lead</BigHeadline>
-        <p className="text-xl text-brand-mute mb-12 font-medium">Buying traffic is easy. Converting it is where systems break.</p>
-        <div className="space-y-4">
-          {['Slow Follow-up Protocols', 'Friction-Heavy Qualification', 'Disconnected Sales Handover'].map((item, i) => (
-            <div key={i} className="flex items-center gap-6 py-6 border-b border-brand-border group">
-               <span className="text-xs font-mono text-brand-mute opacity-40 group-hover:text-brand-problem transition-colors">0{i+1}</span>
-               <span className="text-sm font-black uppercase tracking-widest">{item}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="bg-brand-dim p-12 border border-brand-border relative">
-         <div className="absolute top-4 right-4 text-[8px] font-mono text-brand-problem uppercase">System_Leaking</div>
-         <FunnelDiagram points={['100% Traffic', 'Capture Delay', 'Weak Qualify', 'Failed Handover', 'Lost Revenue']} />
-      </div>
-    </div>
-  </Section>
-);
-
-const System = () => (
-  <Section id="system" className="text-center">
-    <SectionLabel>The Architecture</SectionLabel>
-    <BigHeadline className="mb-24 px-4">A System, Not Campaigns</BigHeadline>
-    <div className="p-16 border border-brand-border bg-brand-dim mb-12 overflow-x-auto">
-       <FlowDiagram steps={['Ads', 'Intent', 'Follow-up', 'Qualify', 'Allocate', 'Convert', 'Loop']} />
-    </div>
-    <p className="text-brand-mute text-xs uppercase font-bold tracking-[0.3em]">
-      Every stage is engineered. Most teams leave this to chance.
-    </p>
-  </Section>
-);
-
-// --- Visualization Components for Case Studies ---
-
-const CaseDiagram = ({ before, after }: { before: string[], after: string[] }) => (
-  <div className="space-y-16 py-8">
-    <div className="space-y-6 opacity-60">
-      <div className="flex items-center gap-3">
-        <span className="text-[9px] uppercase font-black py-1 px-3 border border-brand-border text-brand-problem">Linear / Weak System</span>
-        <div className="h-[1px] flex-grow bg-brand-border/20"></div>
-      </div>
-      <div className="flex items-center justify-between px-2">
-        {before.map((s, i) => (
-          <React.Fragment key={i}>
-            <div className="text-[9px] font-bold uppercase tracking-tighter text-brand-problem">{s}</div>
-            {i < before.length - 1 && <div className="h-[1px] w-4 bg-brand-border/20"></div>}
-          </React.Fragment>
-        ))}
-      </div>
-    </div>
-
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <span className="text-[9px] uppercase font-black bg-brand-accent/10 border border-brand-accent py-1 px-3 text-brand-accent">Engineered System</span>
-        <div className="h-[1px] flex-grow bg-brand-accent/40"></div>
-      </div>
-      <div className="flex items-center justify-between px-2">
-        {after.map((s, i) => (
-          <React.Fragment key={i}>
-            <div className="text-[9px] font-black uppercase tracking-tighter text-brand-ink">{s}</div>
-            {i < after.length - 1 && <div className="h-[1px] w-4 bg-brand-accent"></div>}
-          </React.Fragment>
-        ))}
-      </div>
-    </div>
-  </div>
-);
-
-const CaseStudies = () => {
-  const studies = [
-    {
-      title: "Fixing a Broken Conversion System",
-      situation: "Low conversion (~28%). Focus was CPL only. Passive follow-up caused lead decay.",
-      insight: "Conversion fails in the gap after capture. A 4-hour delay makes leads cold.",
-      decision: "Automated WhatsApp logic. Redesigned sequence. Forced ownership protocols.",
-      impact: "+16.89% Conversion | 45% VR",
-      before: ['Ads', 'Leads', 'Delay', 'Manual', 'No Owner', 'Lost'],
-      after: ['Ads', 'Instant', 'WhatsApp', 'Qualify', 'Owner', 'Conversion'],
-      subtext: "Systemic repair of the post-capture void."
-    },
-    {
-      title: "You Don’t Have an Ad Problem. You Have an Intent Problem.",
-      situation: "High volume, low quality. Campaigns mixed audiences with mismatched intent triggers.",
-      insight: "Efficiency requires matching awareness depth with trust-building sequences.",
-      decision: "Segmented by intent. Sequenced: Discovery → USP → Proof.",
-      impact: "High-intent lead quality at scale.",
-      before: ['Ads', 'Random', 'Mixed', 'Generic', 'Low Intent', 'Fail'],
-      after: ['Ads', 'Segment', 'Cold/Warm', 'Sequence', 'High Intent', 'Scale'],
-      subtext: "Journeys designed for conversion, not clicks."
-    },
-    {
-      title: "Most Marketers Cannot See This.",
-      situation: "Blind optimization. Marketing focused on leads while sales data lived in a silo.",
-      insight: "Algorithms cannot solve for revenue if they are blind to the actual sale.",
-      decision: "Built feedback loops from CRM to Ads. Fed outcome data back to the machine.",
-      impact: "Full-loop growth visibility.",
-      before: ['Ads', 'Leads', 'No Track', 'Sales', 'Unknown'],
-      after: ['Ads', 'Leads', 'CRM', 'Sale', 'Loop'],
-      subtext: "The primary strategic signal for scale."
-    }
-  ];
+const CaseStudy = ({ title, before, after, situational, problem, insight, system, impact, id }: any) => {
+  const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <Section id="proof" className="bg-brand-bg">
-      <div className="mb-24">
-        <SectionLabel>Strategic Proof</SectionLabel>
-        <BigHeadline>Growth <br />Case Studies</BigHeadline>
-      </div>
-
-      <div className="space-y-32">
-        {studies.map((study, i) => (
-          <motion.div 
-            key={i}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start"
-          >
-            <div className="space-y-12 order-2 lg:order-1">
-              <div className="border border-brand-border p-12 bg-brand-dim/30">
-                 <div className="flex justify-between items-center mb-12">
-                   <h3 className="text-xl font-bold uppercase tracking-tight">{study.title}</h3>
-                   <span className="text-[10px] font-mono opacity-30">CASE_0{i + 1}</span>
-                 </div>
-                 <div className="space-y-10">
-                   {[
-                     { l: 'Situation', v: study.situation },
-                     { l: 'Insight', v: study.insight },
-                     { l: 'Decision', v: study.decision }
-                   ].map((d, index) => (
-                     <div key={index}>
-                       <span className="text-[9px] uppercase font-black tracking-widest text-brand-mute block mb-2">{d.l}</span>
-                       <p className="text-sm font-medium leading-relaxed opacity-90">{d.v}</p>
-                     </div>
-                   ))}
-                 </div>
-              </div>
-              <div className="p-10 border border-brand-accent bg-brand-dim group">
-                  <span className="text-[9px] uppercase font-black tracking-widest text-brand-mute block mb-4 group-hover:text-brand-accent transition-colors">Impact Signal</span>
-                  <p className="text-3xl font-display font-black text-brand-accent leading-none uppercase">{study.impact}</p>
-                  <p className="mt-6 text-[10px] uppercase font-bold tracking-widest text-brand-mute">{study.subtext}</p>
-              </div>
+    <div className="premium-border bg-surface-lighter/50 rounded-xl overflow-hidden mb-6" id={id}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full text-left p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-white/5 transition-colors"
+      >
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="px-3 py-1 bg-brand/10 text-brand text-[10px] font-bold uppercase rounded-full">Case Study</span>
+            <h3 className="text-2xl font-display font-bold">{title}</h3>
+          </div>
+          <div className="flex flex-wrap gap-4 mt-4">
+            <div className="flex items-center gap-2">
+              <TrendingDown className="w-4 h-4 text-red-400" />
+              <span className="text-gray-400 text-sm">Before: {before}</span>
             </div>
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-brand" />
+              <span className="text-brand text-sm font-bold">After: {after}</span>
+            </div>
+          </div>
+        </div>
+        <motion.div 
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          className="text-gray-500"
+        >
+          <ChevronDown className="w-6 h-6" />
+        </motion.div>
+      </button>
 
-            <div className="border border-brand-border p-8 bg-brand-bg relative min-h-[400px] flex flex-col justify-center order-1 lg:order-2">
-              <div className="absolute top-4 right-4 flex items-center gap-2">
-                 <div className="w-2 h-2 rounded-full bg-brand-accent animate-pulse"></div>
-                 <span className="text-[8px] font-black uppercase text-brand-accent tracking-widest">System Engineered</span>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="border-t border-white/5 overflow-hidden"
+          >
+            <div className="p-8 grid md:grid-cols-2 gap-12">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Situation</h4>
+                  <p className="text-gray-300">{situational}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">The Real Problem</h4>
+                  <p className="text-gray-300">{problem}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-brand uppercase tracking-wider mb-2">The Insight</h4>
+                  <p className="text-white font-medium italic">"{insight}"</p>
+                </div>
               </div>
-              <CaseDiagram before={study.before} after={study.after} />
-              {i === 2 && (
-                <div className="absolute inset-x-0 bottom-12 flex justify-center pointer-events-none">
-                  <div className="w-1/2 h-12 border-b-2 border-l-2 border-r-2 border-brand-accent/20 rounded-b-2xl flex items-end justify-center pb-2">
-                    <span className="text-[8px] font-black text-brand-accent uppercase tracking-[0.3em]">Feedback Loop</span>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">System Built</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {system.map((item: string) => (
+                      <span key={item} className="px-3 py-1 bg-white/5 premium-border rounded text-xs text-gray-300">{item}</span>
+                    ))}
                   </div>
                 </div>
-              )}
+                <div>
+                  <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">The Outcome</h4>
+                  <p className="text-brand text-xl font-display font-medium leading-relaxed">{impact}</p>
+                </div>
+              </div>
             </div>
           </motion.div>
-        ))}
-      </div>
-    </Section>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
-const SystemsBuilt = () => (
-  <Section>
-    <SmallHeading>Engineering Library</SmallHeading>
-    <p className="text-xs uppercase font-mono text-brand-mute mb-12 tracking-widest pl-12 border-l border-brand-border ml-4">
-      These are not tools. These are systems that changed conversion outcomes.
-    </p>
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-brand-border border border-brand-border">
-      {[
-        "Lead Qualification System",
-        "WhatsApp Automation Flow",
-        "Funnel Messaging System",
-        "Closed-loop Attribution Model",
-        "Lead Allocation System"
-      ].map((s, i) => (
-        <div key={i} className="p-12 bg-black hover:bg-brand-dim transition-colors group h-48 flex items-center">
-           <div className="flex gap-6 items-center">
-              <span className="text-xs font-mono opacity-20 group-hover:opacity-100 transition-opacity">0{i+1}</span>
-              <span className="text-sm font-black uppercase tracking-[0.2em] leading-snug">{s}</span>
-           </div>
-        </div>
-      ))}
-    </div>
-  </Section>
-);
+export default function App() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
 
-const Thinking = () => (
-  <Section id="thinking">
-    <div className="grid lg:grid-cols-2 gap-24">
-      <div>
-        <SectionLabel>Core Logic</SectionLabel>
-        <BigHeadline>Operational <br />Truths</BigHeadline>
-      </div>
-      <div className="space-y-16 py-12">
-        {[
-          "Ads don’t drive growth. Systems do.",
-          "Lead volume without conversion = wasted spend.",
-          "Speed of response is a revenue lever.",
-          "Marketing and sales must operate as one system."
-        ].map((s, i) => (
-          <div key={i} className="border-l-2 border-brand-border pl-8 py-4 group hover:border-brand-accent transition-colors">
-            <p className="text-2xl md:text-3xl font-display font-medium tracking-tight leading-tight uppercase group-hover:text-brand-accent transition-colors">
-              “{s}”
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
+  return (
+    <div className="min-h-screen selection:bg-brand selection:text-black">
+      {/* SECTION 1: HERO */}
+      <header className="relative pt-32 pb-24 px-6 max-w-7xl mx-auto overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative z-10"
+        >
+          <div className="premium-border inline-block px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest text-brand uppercase mb-8 bg-brand/5">
+            OPEN TO SENIOR ROLES
+          </div>
+          
+          <h1 className="text-6xl md:text-8xl font-display font-bold leading-[0.95] tracking-tighter mb-8">
+            I Don't <GreenText>Just</GreenText> Run Ads. <br />
+            I <GreenText>Build Systems</GreenText> That Convert.
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-gray-400 max-w-2xl font-light mb-12 leading-relaxed">
+            Senior Performance Marketing Specialist with a track record of fixing full-funnel conversion leaks — from ad signal to closed lead — at IQI Global.
+          </p>
+
+          <div className="flex flex-wrap gap-4 mb-20">
+            <motion.a 
+              href="#case-studies"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-brand text-black px-8 py-4 rounded font-bold flex items-center gap-2"
+            >
+              View My Work <ArrowRight className="w-4 h-4" />
+            </motion.a>
+            <motion.a 
+              href="https://drive.google.com/file/d/1mtJ0PvjPUkvS4MFdd89D0rKNW-V2X00R/view?usp=drive_link"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+              className="px-8 py-4 premium-border rounded font-bold text-gray-400 flex items-center gap-2"
+            >
+              Download CV <Download className="w-4 h-4" />
+            </motion.a>
+          </div>
+
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+          >
+            <StatCard 
+              val="55%" 
+              label="CAC Reduction" 
+              sub="RM120 → RM53.74 · IQI Global Summit Campaign" 
+            />
+            <StatCard 
+              val="+61%" 
+              label="Lead Verification" 
+              sub="28% → 45% · Recruitment Funnel" 
+            />
+            <StatCard 
+              val="80%" 
+              label="Efficiency Gain" 
+              sub="3–6 hrs → ~1 hr/day Response Workload" 
+            />
+            <StatCard 
+              val="103%" 
+              label="Over Target" 
+              sub="203 downloads · RM198 total spend" 
+            />
+          </motion.div>
+        </motion.div>
+        
+        {/* Background Decorative Element */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none" />
+      </header>
+
+      <div className="section-divider" />
+
+      {/* SECTION 2: WHO I AM */}
+      <section className="py-24 px-6 max-w-7xl mx-auto" id="who-i-am">
+        <SectionLabel>THE CANDIDATE</SectionLabel>
+        <h2 className="text-4xl md:text-5xl font-display font-bold max-w-3xl mb-16 leading-tight">
+          I'm the marketer who <GreenText>asks why leads are leaking</GreenText> — not just how to get more.
+        </h2>
+        
+        <div className="grid md:grid-cols-3 gap-12">
+          <div className="space-y-4">
+            <div className="premium-border w-10 h-10 rounded-full flex items-center justify-center mb-6">
+              <Globe className="w-5 h-5 text-brand" />
+            </div>
+            <h3 className="text-xl font-bold">Background</h3>
+            <p className="text-gray-400 leading-relaxed">
+              Senior Performance Marketing Specialist at IQI Global. 3+ years building and optimizing full-funnel conversion systems across Meta, TikTok, Google, and WhatsApp automation.
             </p>
           </div>
-        ))}
-      </div>
-    </div>
-  </Section>
-);
+          <div className="space-y-4">
+            <div className="premium-border w-10 h-10 rounded-full flex items-center justify-center mb-6">
+              <Database className="w-5 h-5 text-brand" />
+            </div>
+            <h3 className="text-xl font-bold">Approach</h3>
+            <p className="text-gray-400 leading-relaxed">
+              I connect ad strategy with automation, CRM hygiene, lead routing, and conversion tracking. I don't stop at the click — I follow the lead all the way to close.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="premium-border w-10 h-10 rounded-full flex items-center justify-center mb-6">
+              <Zap className="w-5 h-5 text-brand" />
+            </div>
+            <h3 className="text-xl font-bold">Tools</h3>
+            <div className="flex flex-wrap gap-2">
+              {['Meta Ads', 'TikTok Ads', 'Google Ads', 'GA4', 'GSC', 'Power BI', 'Tableau', 'HubSpot', 'Salesforce', 'Brevo', 'Semrush', 'WhatsApp API', 'Python basics'].map(tool => (
+                <span key={tool} className="px-2 py-1 bg-white/5 premium-border rounded text-[10px] font-bold uppercase text-gray-500 whitespace-nowrap">{tool}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-const Diagnostic = () => (
-  <Section className="bg-brand-dim/20">
-    <div className="max-w-3xl">
-      <SectionLabel>Audit</SectionLabel>
-      <BigHeadline className="mb-24">Most Teams Don’t Have <br />Answers to These</BigHeadline>
-      <div className="space-y-8">
-        {[
-          "Do you know which campaigns generate actual conversions?",
-          "How fast do you respond to leads?",
-          "What defines a qualified lead?",
-          "Is your follow-up structured or manual?",
-          "How does sales feedback reach marketing?",
-          "Where do leads drop off?",
-          "Who owns the lead after it’s generated?"
-        ].map((q, i) => (
-           <div key={i} className="flex gap-6 items-start">
-             <div className="w-1 h-1 bg-brand-accent mt-2 rounded-full"></div>
-             <p className="text-base font-bold uppercase tracking-tight opacity-70 hover:opacity-100 transition-opacity">{q}</p>
-           </div>
-        ))}
-      </div>
-      <p className="mt-24 text-brand-mute font-mono text-xs uppercase tracking-widest">
-        If these are unclear, the issue isn’t performance — it’s system design.
-      </p>
-    </div>
-  </Section>
-);
+      <div className="section-divider" />
 
-const CTA = () => (
-  <Section id="contact" className="py-48 text-center" paddingY="py-48">
-    <div className="max-w-4xl mx-auto">
-      <h2 className="text-4xl md:text-6xl font-display font-black uppercase mb-8 px-4">
-        If your funnel is leaking, it’s not a traffic problem.
-      </h2>
-      <h3 className="text-4xl md:text-5xl font-display font-black uppercase mb-24 px-4 text-brand-accent">
-        It’s a system problem. <br /> I fix that.
-      </h3>
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-8">
-        <a href="mailto:contact@example.com" className="w-full sm:w-auto px-16 py-6 bg-brand-ink text-brand-bg font-black uppercase text-[11px] tracking-[0.3em] hover:opacity-90 transition-opacity">
-          Fix My System
-        </a>
-      </div>
-    </div>
-  </Section>
-);
+      {/* SECTION 3: THE ORIGIN STORY */}
+      <section className="py-24 px-6 max-w-7xl mx-auto bg-surface-lighter/30">
+        <SectionLabel>WHERE IT STARTED</SectionLabel>
+        <h2 className="text-5xl font-display font-bold mb-12">The <GreenText>Functional Illusion</GreenText>.</h2>
+        
+        <div className="grid md:grid-cols-2 gap-16 items-start">
+          <div className="space-y-8">
+            <p className="text-xl text-gray-400 leading-relaxed font-light">
+              When I stepped into my role as Senior Performance Marketing Specialist at IQI Global, the system looked functional on the surface — ads were running, leads were coming in, and teams were contributing content.
+            </p>
+            <p className="text-xl text-gray-400 leading-relaxed font-light">
+              But when I looked deeper, the process was fragmented. Content was driven by intuition rather than data. Ads focused on branding instead of conversion. Most leads were unqualified, and follow-up depended entirely on manual effort from interns and telemarketers.
+            </p>
+          </div>
+          <div className="border-l-4 border-brand pl-8 py-4">
+            <blockquote className="text-3xl font-display font-medium leading-snug">
+              "The verification rate was <GreenText>28%</GreenText> — meaning most leads we paid for were not genuinely interested."
+            </blockquote>
+          </div>
+        </div>
+      </section>
 
-// --- Main App ---
+      {/* SECTION 4: THE DIAGNOSIS */}
+      <section className="py-24 px-6 max-w-7xl mx-auto">
+        <SectionLabel>THE REAL PROBLEM</SectionLabel>
+        <div className="grid md:grid-cols-3 gap-6 mb-20">
+          <div className="p-8 premium-border bg-surface-lighter rounded-xl">
+            <Target className="w-10 h-10 text-brand mb-6" />
+            <h3 className="text-xl font-bold mb-4">WRONG INTENT ATTRACTED</h3>
+            <p className="text-gray-400">Ads were pulling in curious browsers, not people ready to commit to a commission-based real estate career.</p>
+          </div>
+          <div className="p-8 premium-border bg-surface-lighter rounded-xl">
+            <MessageSquare className="w-10 h-10 text-brand mb-6" />
+            <h3 className="text-xl font-bold mb-4">EXPECTATIONS NOT SHAPED</h3>
+            <p className="text-gray-400">Nothing in the funnel explained what joining IQI Global actually meant — so leads dropped off after submission.</p>
+          </div>
+          <div className="p-8 premium-border bg-surface-lighter rounded-xl">
+            <Clock className="w-10 h-10 text-brand mb-6" />
+            <h3 className="text-xl font-bold mb-4">MANUAL SYSTEM, NO SCALE</h3>
+            <p className="text-gray-400">Every lead required a human to follow up. No automation. No routing logic. Speed was the casualty.</p>
+          </div>
+        </div>
+        
+        <div className="text-center">
+          <h3 className="text-3xl md:text-6xl font-display font-medium tracking-tight">
+            This wasn't an ads problem. <br />
+            It was a <GreenText>conversion system</GreenText> problem — from input to outcome.
+          </h3>
+        </div>
+      </section>
 
-export default function App() {
-  return (
-    <div className="min-h-screen bg-brand-bg selection:bg-brand-accent selection:text-brand-bg">
-      <Navbar />
-      <Hero />
-      <Introduction />
-      <Problem />
-      <System />
-      <CaseStudies />
-      <SystemsBuilt />
-      <Thinking />
-      <Diagnostic />
-      <CTA />
-      
-      {/* Texture Layer */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.04] z-[100] mix-blend-overlay">
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <filter id="noise">
-            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#noise)" />
-        </svg>
-      </div>
+      <div className="section-divider" />
+
+      {/* SECTION 5: THE MINDSET SHIFT */}
+      <section className="py-24 px-6 max-w-7xl mx-auto">
+        <SectionLabel>THE SHIFT</SectionLabel>
+        <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <div className="p-12 premium-border bg-white/5 rounded-2xl flex flex-col items-center justify-center text-center">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">OLD QUESTION</div>
+            <div className="text-2xl font-light italic">"Which ad performs better?"</div>
+          </div>
+          <div className="p-12 border-2 border-brand bg-brand/5 rounded-2xl flex flex-col items-center justify-center text-center">
+            <div className="text-xs font-bold text-brand uppercase tracking-widest mb-4">NEW QUESTION</div>
+            <div className="text-3xl font-display font-bold">"Where are we losing people — and why?"</div>
+          </div>
+        </div>
+        <div className="text-center text-gray-400 font-medium">
+          Instead of optimizing isolated parts, I started mapping the entire system: 
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+            {['Signal', 'Intent', 'Qualification', 'Response', 'Routing', 'Conversion'].map((step, i, arr) => (
+              <React.Fragment key={step}>
+                <span className="text-white font-bold">{step}</span>
+                {i < arr.length - 1 && <ArrowRight className="w-4 h-4 text-brand" />}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="section-divider" />
+
+      {/* SECTION 6: HOW I FIX THE INPUT */}
+      <section className="py-24 px-6 max-w-7xl mx-auto">
+        <SectionLabel>THE INPUT SYSTEM</SectionLabel>
+        <h2 className="text-5xl font-display font-bold mb-8">Most teams jump to creative. <br /><GreenText>I start with demand.</GreenText></h2>
+        
+        <div className="max-w-3xl mb-16">
+          <p className="text-xl text-gray-400 leading-relaxed">
+            I use search data and behavioral signals to find what people are actually worried about before they enter real estate — income expectations, fear of commission-based roles, uncertainty about career switching. I map each signal to a human motivation and combine it with ad performance data, telemarketer feedback, and conversion patterns.
+          </p>
+        </div>
+
+        <div className="premium-border bg-surface-lighter p-8 md:p-12 rounded-3xl mb-12">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
+            <div className="space-y-1">
+              <div className="text-3xl font-display font-medium">Search Signal</div>
+            </div>
+            <div className="text-4xl font-light text-gray-700 md:-mt-2">+</div>
+            <div className="space-y-1">
+              <div className="text-3xl font-display font-medium">Fear/Desire Mapping</div>
+            </div>
+            <div className="text-4xl font-light text-gray-700 md:-mt-2">+</div>
+            <div className="space-y-1">
+              <div className="text-3xl font-display font-medium">Conversion Data</div>
+            </div>
+            <div className="text-4xl font-light text-brand md:-mt-2 px-4">=</div>
+            <div className="text-4xl font-display font-bold text-brand">= Campaign Angle That Converts</div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          {['GA4', 'GSC', 'Semrush', 'Meta Ad Library', 'Telemarketer Feedback', 'Social Performance'].map(source => (
+            <div key={source} className="flex items-center gap-2 px-4 py-2 premium-border rounded-full text-xs font-medium text-gray-400">
+              <div className="w-1.5 h-1.5 rounded-full bg-brand" />
+              {source}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION 7: WHAT I BUILT */}
+      <section className="py-24 px-6 max-w-7xl mx-auto" id="case-studies">
+        <div className="mb-16">
+          <SectionLabel>SUCCESS EVIDENCE</SectionLabel>
+          <h2 className="text-5xl font-display font-bold">Flagship Projects</h2>
+        </div>
+
+        <CaseStudy 
+          title="IQI Global — Recruitment Funnel System"
+          before="VR 28%, Response 3-6hrs/day"
+          after="VR 45%, Response ~1hr/day"
+          situational="IQI Global needed more quality sign-ups from people who wanted to become real estate agents."
+          problem="Leads came from Meta, TikTok, Google, and website forms, but verification was weak and response speed depended on human availability."
+          insight="The real leakage happened after the lead submitted — not before."
+          system={['Data-backed ad ideation', 'WhatsApp automation', 'Lead form filtering', 'Website chatbot', 'Performance-based lead routing', 'Missing lead tracker']}
+          impact="VR 28% → 45% · Response workload cut ~75% · Overall conversion +16.89%"
+        />
+
+        <CaseStudy 
+          title="IQI Global — International Summit Funnel"
+          before="CAC RM120, Low transactions"
+          after="CAC RM53.74, 93 leads"
+          situational="Campaign needed to attract investors and business owners to a global real estate summit."
+          problem="The ad wasn't the problem — the landing page failed to answer why join, who should join, and what value attendees get."
+          insight="The landing page is the expectation-shaper. If it fails to answer 'What's in it for me', the ad money is wasted."
+          system={['Audience journey review', 'Landing page revamp', 'EDM list cleaning', 'Retargeting pool', 'Reminder sequence']}
+          impact="CAC RM120 → RM53.74 · 93 total leads generated"
+        />
+
+        <CaseStudy 
+          title="IQI Global / Taco — Ebook Lead System"
+          before="Target 100 downloads, paid-only"
+          after="203 downloads, RM0.98 CPD"
+          situational="Campaign launched to drive downloads for a real estate career guide ebook."
+          problem="The target was 100 downloads with a heavy reliance on cold paid traffic which was driving costs up."
+          insight="Strongest audience was the existing community, not cold traffic."
+          system={['Paid ads', 'Social content', 'Writer articles', 'EDM', 'Community push', 'Cross-team collab']}
+          impact="203 downloads (103% over target) · Total spend RM198.09 · CPD RM0.98"
+        />
+
+        <div className="mt-8 p-6 border-2 border-brand/20 bg-brand/5 rounded-xl border-dashed">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="w-6 h-6 text-brand" />
+            <span className="text-brand font-bold text-lg">Benchmark: Industry avg CPD via paid SEA: RM5–15+. Achieved: RM0.98 — ~10x more efficient.</span>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 8: HOW I THINK TODAY */}
+      <section className="py-24 px-6 max-w-7xl mx-auto text-center">
+        <SectionLabel>MY OPERATING PRINCIPLES</SectionLabel>
+        <h2 className="text-4xl md:text-5xl font-display font-bold mb-20 max-w-4xl mx-auto">
+          I don't see ads as a function. <br /><GreenText>I see them as signals.</GreenText>
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-8 mb-20">
+          {[
+            "Attract the right intent, not just volume",
+            "Shape expectations before the lead submits",
+            "Respond fast, route smart, track everything"
+          ].map((principle, i) => (
+            <div key={i} className="p-10 premium-border rounded-2xl bg-surface-lighter flex flex-col items-center justify-center">
+              <div className="text-brand mb-6">
+                {i === 0 && <Target className="w-10 h-10" />}
+                {i === 1 && <MessageSquare className="w-10 h-10" />}
+                {i === 2 && <Zap className="w-10 h-10" />}
+              </div>
+              <p className="text-xl font-bold leading-tight">{principle}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="max-w-5xl mx-auto">
+          <h3 className="text-4xl md:text-7xl font-display font-medium tracking-tighter italic">
+            "The biggest growth didn't come from better ads alone — it came from fixing <GreenText>both</GreenText> the input and the <GreenText>system</GreenText> that converts it."
+          </h3>
+        </div>
+      </section>
+
+      <div className="section-divider" />
+
+      {/* SECTION 9: SKILLS */}
+      <section className="py-24 px-6 max-w-7xl mx-auto">
+        <SectionLabel>WHAT I BRING</SectionLabel>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            {
+              title: "Performance Marketing",
+              sub: "Meta, TikTok, Google, LinkedIn",
+              icon: <BarChart3 className="w-6 h-6" />
+            },
+            {
+              title: "Conversion System Design",
+              sub: "WhatsApp automation, chatbot, routing",
+              icon: <Zap className="w-6 h-6" />
+            },
+            {
+              title: "Data & Insight",
+              sub: "GA4, GSC, Power BI, Tableau, Semrush",
+              icon: <Database className="w-6 h-6" />
+            },
+            {
+              title: "Lifecycle & CRM",
+              sub: "HubSpot, Salesforce, Brevo, EDM",
+              icon: <Mail className="w-6 h-6" />
+            }
+          ].map((skill, i) => (
+            <div key={i} className="p-8 premium-border bg-surface-lighter rounded-xl">
+              <div className="text-brand mb-6">{skill.icon}</div>
+              <h3 className="text-xl font-bold mb-2 leading-tight">{skill.title}</h3>
+              <p className="text-gray-500 text-sm leading-relaxed">{skill.sub}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="section-divider" />
+
+      {/* SECTION 10: CTA */}
+      <section className="py-32 px-6 max-w-4xl mx-auto text-center" id="contact">
+        <SectionLabel>LET'S TALK</SectionLabel>
+        <h2 className="text-5xl md:text-7xl font-display font-bold mb-8 tracking-tighter">
+          Is Your Marketing Team Ready for a <GreenText>Systems Thinker</GreenText>?
+        </h2>
+        <p className="text-xl text-gray-400 mb-12 leading-relaxed">
+          I'm currently exploring senior roles in performance marketing, growth, or marketing operations. If you're building a team that cares about full-funnel conversion — not just CPL — I'd love to have a conversation.
+        </p>
+        
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+          <motion.a 
+            href="https://my.linkedin.com/in/shen-shian-khiew-8ba02520a"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-brand text-black px-12 py-5 rounded-full font-bold flex items-center gap-2 text-lg shadow-lg shadow-brand/20"
+          >
+            Connect on LinkedIn <Linkedin className="w-5 h-5" />
+          </motion.a>
+          <motion.a 
+            href="https://drive.google.com/file/d/1mtJ0PvjPUkvS4MFdd89D0rKNW-V2X00R/view?usp=drive_link"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+            className="px-12 py-5 premium-border rounded-full font-bold text-gray-300 flex items-center gap-2 text-lg"
+          >
+            Download CV <Download className="w-5 h-5" />
+          </motion.a>
+        </div>
+      </section>
+
+      <footer className="py-12 px-6 border-t border-white/5 text-center text-gray-600 text-sm">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+          <span>&copy; 2025 Khiew Shen Shian</span>
+          <span className="hidden md:block">|</span>
+          <span>Senior Performance Marketing Specialist</span>
+          <span className="hidden md:block">|</span>
+          <span className="text-brand/50">Available for Senior Roles</span>
+        </div>
+      </footer>
     </div>
   );
 }
